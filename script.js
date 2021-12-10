@@ -1,20 +1,22 @@
 const mainSec = document.querySelector(".main");
 
-const continentArr = [
+let continentArr = [
   { continent: { name: "Asia", countries: [] } },
   { continent: { name: "Africa", countries: [] } },
   { continent: { name: "Europe", countries: [] } },
   { continent: { name: "Americas", countries: [] } },
   { continent: { name: "Oceania", countries: [] } },
 ];
+
 const names = ["asia", "africa", "europe", "americas", "oceania"];
 
-function continentNames() {
+async function continentNames() {
+  mainSec.innerHTML = "";
   names.forEach((name) => {
     makeButtons(name);
-    getCountryData(name);
   });
 }
+continentNames();
 
 function makeButtons(name) {
   const contiContainer = document.createElement("div");
@@ -22,80 +24,80 @@ function makeButtons(name) {
   contiContainer.id = `${name}`;
   contiContainer.classList.add(`cont`);
   mainSec.appendChild(contiContainer);
-  const btn = document.createElement("button");
+  const btn = document.createElement("div");
+  btn.classList.add("continentBtn");
   btn.innerText = `${name}`;
   contiContainer.appendChild(btn);
+  btn.addEventListener("click", () => {
+    continentNames();
+    clickContinentBtn(`${btn.innerText}`);
+  });
 }
 
 async function getCountryData(name) {
-  try {
-    const response = await axios.get(
-      `https://intense-mesa-62220.herokuapp.com/https://restcountries.herokuapp.com/api/v1/region/${name}`
-    );
+  const response = await axios.get(
+    `https://intense-mesa-62220.herokuapp.com/https://restcountries.herokuapp.com/api/v1/region/${name}`
+  );
+  return response.data;
+}
+function clickContinentBtn(name) {
+  getCountryData(name).then((data) => {
+    getCountNameNRegion(data);
+  });
 
-    const finalResponse = await response.data;
-
-    // while (!finalResponse.done) {
-    //   console.log("not done");
-    // }
-    // console.log(finalResponse);
-    getCountNameNRegion(await finalResponse);
-  } catch (e) {
-    console.log(`error!!! ${e}`);
-  }
+  setTimeout(() => {
+    makeDropdown(name);
+  }, 500);
 }
 
 async function getCountNameNRegion(data) {
-  console.log(data);
-  data.forEach((country) => {
-    let countryCode = country.cca2;
-    let countName = country.name.common;
-    let region = country.region;
+  for (let i = 0; i < data.length; i++) {
+    let countryCode = data[i].cca2;
+    let countName = data[i].name.common;
+    let region = data[i].region;
     newObj = {
       name: countName,
       region: region,
       country_code: countryCode,
     };
+
     pushCountries(newObj);
-  });
+  }
 }
 
-function pushCountries(obj) {
-  continentArr.forEach((el) => {
+async function pushCountries(obj) {
+  for (let el of continentArr) {
     if (obj.region === el.continent.name) {
-      // console.log(obj);
       el.continent.countries.push(obj);
     }
-  });
-}
-// createDropdown();
-
-continentNames();
-console.log(continentArr);
-console.log(continentArr[0].continent.countries);
-console.log(continentArr[0].continent.countries.length);
-
-function createDropdown() {
-  window.addEventListener("load", (e) => {
-    const btnDiv = document.querySelectorAll(".cont");
-    btnDiv.forEach((el) => {
-      console.log(el);
-      console.log(continentArr[0].continent.name);
-      const select = document.createElement("select");
-      el.appendChild(select);
-      // populateOptions(el);
-    });
-  });
+  }
 }
 
-function populateOptions(el) {
+function makeDropdown(name) {
+  const btnDiv = document.querySelector(`#${name}`);
+  const select = document.createElement("select");
+  select.classList.add(`${name}Select`);
+  btnDiv.appendChild(select);
+
+  populateOption(name);
+}
+
+function populateOption(name) {
+  const contSelect = document.querySelector(`#${name}`);
   continentArr.forEach((e) => {
-    const name = e.continent.name.toLocaleLowerCase();
-    if (name === el.id) {
-      console.log(name, el.id);
+    const nameArr = e.continent.name.toLocaleLowerCase();
+    if (nameArr === name) {
       const countries = e.continent.countries;
-      console.log(countries.length);
-      console.log(continentArr[0].continent.name);
+      countries.forEach((country) => {
+        makeSelectBtns(country, contSelect);
+      });
     }
   });
+}
+
+function makeSelectBtns(country, select) {
+  const selectedSelect = document.querySelector(`.${select.id}Select`);
+  const dropDownName = document.createElement("option");
+  dropDownName.innerText = country.name;
+  selectedSelect.appendChild(dropDownName);
 }

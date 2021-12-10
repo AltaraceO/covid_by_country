@@ -1,0 +1,27 @@
+.main {
+  display: flex;
+  max-width: 100px;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-around;
+  gap: 30px;
+}
+
+.main-container {
+  max-width: 100px;
+}
+
+.continentBtn {
+  width: 100px;
+  height: 20px;
+  background-color: aliceblue;
+}
+
+.cont {
+  position: relative;
+}
+
+select {
+  max-width: 100px;
+  position: absolute;
+}

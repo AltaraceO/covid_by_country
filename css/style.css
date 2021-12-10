@@ -14,11 +14,14 @@
   justify-content: flex-start;
   gap: 1rem;
 }
-
+#myChart {
+  width: 100%;
+}
 .continentBtn {
   width: 100px;
   height: 20px;
-  background-color: aliceblue;
+  background-color: rgb(161, 163, 165);
+  color: aliceblue;
 }
 
 .cont {
@@ -28,6 +31,7 @@
 select {
   max-width: 100px;
   position: absolute;
+  top: 25px;
   border: lightblue 1px solid;
   background-color: whitesmoke;
   border-radius: 3px;

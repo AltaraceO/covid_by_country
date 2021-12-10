@@ -154,8 +154,10 @@ async function addAndCompare(data) {
 getCovidInfo().then((data) => {
   addAndCompare(data);
 });
-// *will be triggered when continent button is pressed
 
+// *will be triggered when continent button is pressed
+let charLabels = [];
+let charData = [];
 function arrangeContinentCovidStat(idx) {
   setTimeout(() => {
     const contCompare = continentArr[idx].continent.countries;
@@ -164,9 +166,51 @@ function arrangeContinentCovidStat(idx) {
     for (let i = 0; i < contCompare.length; i++) {
       for (let j = 0; j < fullCompare.length; j++) {
         if (contCompare[i].country_code === fullCompare[j].code) {
-          console.log(contCompare[i].country_code, fullCompare[j].recovered);
+          console.log(contCompare[i].name, fullCompare[j].recovered);
+          charLabels.push(contCompare[i].name);
+          charData.push(fullCompare[j].recovered);
         }
       }
     }
   }, 500);
 }
+
+// ---------------------chart--------
+
+const ctx = document.getElementById("myChart").getContext("2d");
+const myChart = new Chart(ctx, {
+  type: "bar",
+  data: {
+    Labels: charLabels,
+    datasets: [
+      {
+        label: "# of Votes",
+        Data: charData,
+        backgroundColor: [
+          "rgba(255, 99, 132, 0.2)",
+          "rgba(54, 162, 235, 0.2)",
+          "rgba(255, 206, 86, 0.2)",
+          "rgba(75, 192, 192, 0.2)",
+          "rgba(153, 102, 255, 0.2)",
+          "rgba(255, 159, 64, 0.2)",
+        ],
+        borderColor: [
+          "rgba(255, 99, 132, 1)",
+          "rgba(54, 162, 235, 1)",
+          "rgba(255, 206, 86, 1)",
+          "rgba(75, 192, 192, 1)",
+          "rgba(153, 102, 255, 1)",
+          "rgba(255, 159, 64, 1)",
+        ],
+        borderWidth: 1,
+      },
+    ],
+  },
+  options: {
+    scales: {
+      y: {
+        beginAtZero: true,
+      },
+    },
+  },
+});

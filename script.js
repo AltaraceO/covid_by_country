@@ -1,4 +1,7 @@
 const mainSec = document.querySelector(".main");
+const proxi = "https://intense-mesa-62220.herokuapp.com/";
+const countryInfo = "https://restcountries.herokuapp.com/api/v1/region/";
+const covidInfo = "https://corona-api.com/countries";
 
 let continentArr = [
   { continent: { name: "Asia", countries: [] } },
@@ -8,17 +11,22 @@ let continentArr = [
   { continent: { name: "Oceania", countries: [] } },
 ];
 
+const covidArr = [];
+
 const names = ["asia", "africa", "europe", "americas", "oceania"];
 
 async function continentNames() {
   mainSec.innerHTML = "";
-  names.forEach((name) => {
-    makeButtons(name);
-  });
+  // names.forEach((name) => {
+  //   makeButtons(name);
+  // });
+  for (let i = 0; i < names.length; i++) {
+    makeButtons(names[i], i);
+  }
 }
 continentNames();
 
-function makeButtons(name) {
+function makeButtons(name, idx) {
   const contiContainer = document.createElement("div");
   contiContainer.setAttribute(`id`, `${name}`);
   contiContainer.id = `${name}`;
@@ -31,15 +39,15 @@ function makeButtons(name) {
   btn.addEventListener("click", () => {
     continentNames();
     clickContinentBtn(`${btn.innerText}`);
+    arrangeContinentCovidStat(idx);
   });
 }
 
 async function getCountryData(name) {
-  const response = await axios.get(
-    `https://intense-mesa-62220.herokuapp.com/https://restcountries.herokuapp.com/api/v1/region/${name}`
-  );
+  const response = await axios.get(`${proxi}${countryInfo}${name}`);
   return response.data;
 }
+
 function clickContinentBtn(name) {
   getCountryData(name).then((data) => {
     getCountNameNRegion(data);
@@ -84,6 +92,9 @@ function makeDropdown(name) {
 
 function populateOption(name) {
   const contSelect = document.querySelector(`#${name}`);
+  const contSelectSelect = document.querySelector(`.${name}Select`);
+  contSelectSelect.innerHTML = "";
+
   continentArr.forEach((e) => {
     const nameArr = e.continent.name.toLocaleLowerCase();
     if (nameArr === name) {
@@ -93,11 +104,69 @@ function populateOption(name) {
       });
     }
   });
+  addSelectEvent(contSelect);
 }
 
 function makeSelectBtns(country, select) {
   const selectedSelect = document.querySelector(`.${select.id}Select`);
   const dropDownName = document.createElement("option");
+  const cc = country.country_code;
+
+  dropDownName.setAttribute("id", cc);
   dropDownName.innerText = country.name;
   selectedSelect.appendChild(dropDownName);
+}
+
+function addSelectEvent(name) {
+  const selectedSelect = document.querySelector(`.${name.id}Select`);
+
+  selectedSelect.addEventListener("change", (event) => {
+    const optionName = event.target.value;
+    const optionCc = event.target.options[event.target.selectedIndex].id;
+    console.log(optionName);
+    console.log(optionCc);
+  });
+}
+
+function displayCountryInfo(optionName) {}
+
+async function getCovidInfo() {
+  const response = await axios.get(`${proxi}${covidInfo}`);
+  return response.data;
+}
+async function addAndCompare(data) {
+  data = data.data;
+  // console.log(data);
+  data.forEach((e) => {
+    const newObj = {
+      code: e.code,
+      confrim: e.latest_data.confirmed,
+      deadTotal: e.latest_data.deaths,
+      critical: e.latest_data.critical,
+      recovered: e.latest_data.recovered,
+      deadNew: e.today.deaths,
+      newCases: e.today.confirmed,
+    };
+    covidArr.push(newObj);
+  });
+}
+
+getCovidInfo().then((data) => {
+  addAndCompare(data);
+});
+// *will be triggered when continent button is pressed
+
+function arrangeContinentCovidStat(idx) {
+  setTimeout(() => {
+    const contCompare = continentArr[idx].continent.countries;
+    const fullCompare = covidArr;
+
+    for (let i = 0; i < contCompare.length; i++) {
+      for (let j = 0; j < fullCompare.length; j++) {
+        if (contCompare[i].country_code === fullCompare[j].code) {
+          console.log(contCompare[i].country_code, fullCompare[j].recovered);
+        }
+      }
+    }
+  }, 500);
 }

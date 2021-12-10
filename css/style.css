@@ -24,4 +24,7 @@
 select {
   max-width: 100px;
   position: absolute;
+  border: lightblue 1px solid;
+  background-color: whitesmoke;
+  border-radius: 3px;
 }

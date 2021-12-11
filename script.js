@@ -38,6 +38,7 @@ function makeButtons(name, idx) {
     continentNames();
     clickContinentBtn(`${btn.innerText}`);
     arrangeContinentCovidStat(idx);
+    statSpecificBtn(idx);
   });
 }
 
@@ -141,11 +142,11 @@ async function addAndCompare(data) {
   data.forEach((e) => {
     const newObj = {
       code: e.code,
-      confrim: e.latest_data.confirmed,
-      deadTotal: e.latest_data.deaths,
+      confrimed: e.latest_data.confirmed,
+      [`total dead`]: e.latest_data.deaths,
       critical: e.latest_data.critical,
       recovered: e.latest_data.recovered,
-      deadNew: e.today.deaths,
+      [`new dead`]: e.today.deaths,
       newCases: e.today.confirmed,
     };
     covidArr.push(newObj);
@@ -158,7 +159,7 @@ getCovidInfo().then((data) => {
 
 // *will be triggered when continent button is pressed
 
-function arrangeContinentCovidStat(idx) {
+function arrangeContinentCovidStat(idx, stat = [`total dead`]) {
   let charLabels = [];
   let charData = [];
   setTimeout(() => {
@@ -170,21 +171,15 @@ function arrangeContinentCovidStat(idx) {
     for (let i = 0; i < contCompare.length; i++) {
       for (let j = 0; j < fullCompare.length; j++) {
         if (contCompare[i].country_code === fullCompare[j].code) {
-          // console.log(contCompare[i].name, fullCompare[j].recovered);
+          // console.log(contCompare[i].name, fullCompare[j].deadNew);
           charLabels.push(contCompare[i].name);
-          charData.push(fullCompare[j].recovered);
+          charData.push(fullCompare[j][stat]);
         }
       }
     }
 
     updateChart(myChart, charLabels, charData);
   }, 500);
-}
-function clearChart() {
-  const charByClass = document.querySelector(".chartjs-hidden-iframe");
-  if (charByClass) {
-    charByClass.remove();
-  }
 }
 
 function updateChart(myChart, label, data) {
@@ -193,10 +188,32 @@ function updateChart(myChart, label, data) {
   myChart.update();
 }
 
+function statSpecificBtn(idx) {
+  const statsContainer = document.querySelector(".specific-stats");
+  console.log(covidArr[0]);
+  if (statsContainer.innerHTML === "") {
+    Object.keys(covidArr[0]).forEach(function (key) {
+      if (key !== "code") {
+        const statBtns = document.createElement("div");
+        statBtns.classList.add("continentBtn");
+        statBtns.innerText = `${key}`;
+        statsContainer.appendChild(statBtns);
+        statBtns.addEventListener("click", () => {
+          // continentNames();
+          // clickContinentBtn(`${btn.innerText}`);
+          arrangeContinentCovidStat(idx, key);
+          // statSpecificBtn();
+          console.log(typeof key);
+        });
+      }
+    });
+  }
+}
+
 // ---------------------chart--------
 
 const myChart = new Chart(ctx, {
-  type: "bar",
+  type: "line",
   data: {
     labels: [],
     datasets: [

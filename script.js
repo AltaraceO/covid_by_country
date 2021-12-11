@@ -16,6 +16,7 @@ const covidArr = [];
 
 const names = ["Asia", "Africa", "Europe", "Americas", "Oceania"];
 
+//*starts the app by creating the country buttons
 async function continentNames() {
   mainSec.innerHTML = "";
   for (let i = 0; i < names.length; i++) {
@@ -24,6 +25,7 @@ async function continentNames() {
 }
 continentNames();
 
+//*creates buttons and adds event listeners that get covid statistics
 function makeButtons(name, idx) {
   const contiContainer = document.createElement("div");
   contiContainer.setAttribute(`id`, `${name}`);
@@ -43,23 +45,22 @@ function makeButtons(name, idx) {
   });
 }
 
+//*remove individual country stats when continent btns are clicked again
 function removeSpecific() {
   const specificDiv = document.querySelector(".specificCountryStats");
-  // console.log(specificDiv);
   if (typeof specificDiv !== "undefined" && specificDiv !== null) {
-    // console.log("here", specificDiv);
     specificDiv.parentNode.removeChild(specificDiv);
   } else {
-    // console.log("not here", specificDiv);
   }
 }
 
+//* fetching country info
 async function getCountryData(name) {
   const response = await axios.get(`${proxi}${countryInfo}${name}`);
-  // console.log(response.data);
   return response.data;
 }
 
+//*calls the country info API when continent is clicked and calls the dropDown functions (1sec delay)
 function clickContinentBtn(name) {
   getCountryData(name).then((data) => {
     getCountNameNRegion(data);
@@ -67,9 +68,10 @@ function clickContinentBtn(name) {
 
   setTimeout(() => {
     makeDropdown(name);
-  }, 500);
+  }, 1000);
 }
 
+//*Populates specific continent arrays with relevant countries and their basic info
 async function getCountNameNRegion(data) {
   for (let i = 0; i < data.length; i++) {
     let countryCode = data[i].cca2;
@@ -85,6 +87,7 @@ async function getCountNameNRegion(data) {
   }
 }
 
+//*gathers objects from above and moves them to relevant array
 async function pushCountries(obj) {
   for (let el of continentArr) {
     if (obj.region === el.continent.name) {
@@ -97,16 +100,17 @@ async function pushCountries(obj) {
   }
 }
 
+//*creates the select menu under the right continent div
 function makeDropdown(name) {
   const btnDiv = document.querySelector(`#${name}`);
   const select = document.createElement("select");
   select.classList.add(`${name}Select`);
   btnDiv.appendChild(select);
-  // console.log(btnDiv);
 
   populateOption(name);
 }
 
+//*goes over continant array and finds matches
 function populateOption(name) {
   const contSelect = document.querySelector(`#${name}`);
   const contSelectSelect = document.querySelector(`.${name}Select`);
@@ -124,6 +128,7 @@ function populateOption(name) {
   addSelectEvent(contSelect);
 }
 
+//*creates the acutal options with links and country code information
 function makeSelectBtns(country, select) {
   const selectedSelect = document.querySelector(`.${select.id}Select`);
   const dropDownName = document.createElement("option");
@@ -134,6 +139,7 @@ function makeSelectBtns(country, select) {
   selectedSelect.appendChild(dropDownName);
 }
 
+//*adds the event listeners to all the options though the main 'select' - then creates all the logic needed to display the data if the option is clicked
 function addSelectEvent(name) {
   const selectedSelect = document.querySelector(`.${name.id}Select`);
 
@@ -157,7 +163,7 @@ function addSelectEvent(name) {
   });
 }
 
-//* populate the specific country div with the right info about said country
+//* populate the specific country div with the right info about said country - this is called in the option event above
 function displayCountryInfo(optionCc, specificDiv) {
   covidArr.forEach((el) => {
     if (el.code === optionCc) {
@@ -173,6 +179,7 @@ function displayCountryInfo(optionCc, specificDiv) {
   });
 }
 
+//*gets all covid information for entire world - extracts the information needed in an object and stores it in a golbal array.
 async function getCovidInfo() {
   const response = await axios.get(`${proxi}${covidInfo}`);
   return response.data;
@@ -197,8 +204,7 @@ getCovidInfo().then((data) => {
   addAndCompare(data);
 });
 
-// *will be triggered when continent button is pressed
-
+// *will be triggered when continent button is pressed - this compares the relevant continant array with the global covid array finds matches and pushes them to the chart
 function arrangeContinentCovidStat(idx, stat = [`total dead`]) {
   let charLabels = [];
   let charData = [];
@@ -218,9 +224,10 @@ function arrangeContinentCovidStat(idx, stat = [`total dead`]) {
     }
 
     updateChart(myChart, charLabels, charData, stat);
-  }, 500);
+  }, 550);
 }
 
+//*arranges the chart and clears it before new changes
 function updateChart(myChart, label, data, stat) {
   myChart.data.labels = label;
   myChart.data.datasets[0].data = data;
@@ -228,6 +235,7 @@ function updateChart(myChart, label, data, stat) {
   myChart.update();
 }
 
+//*creates the buttons for particualr statistics that display specific covid information. - triggered when a continent is checked initially
 function statSpecificBtn(idx) {
   const statsContainer = document.querySelector(".specific-stats");
   statsContainer.innerHTML = "";
@@ -246,7 +254,7 @@ function statSpecificBtn(idx) {
   });
 }
 
-// ---------------------chart--------
+//* ---------------------chart--------
 
 const myChart = new Chart(ctx, {
   type: "line",

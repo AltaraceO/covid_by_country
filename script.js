@@ -18,9 +18,6 @@ const names = ["asia", "africa", "europe", "americas", "oceania"];
 
 async function continentNames() {
   mainSec.innerHTML = "";
-  // names.forEach((name) => {
-  //   makeButtons(name);
-  // });
   for (let i = 0; i < names.length; i++) {
     makeButtons(names[i], i);
   }
@@ -78,7 +75,7 @@ async function pushCountries(obj) {
   for (let el of continentArr) {
     if (obj.region === el.continent.name) {
       if (el.continent.countries.some((count) => count.name === obj.name)) {
-        console.log("already");
+        console.log("no double clicking!");
       } else {
         el.continent.countries.push(obj);
       }
@@ -141,7 +138,6 @@ async function getCovidInfo() {
 }
 async function addAndCompare(data) {
   data = data.data;
-  // console.log(data);
   data.forEach((e) => {
     const newObj = {
       code: e.code,
@@ -162,9 +158,6 @@ getCovidInfo().then((data) => {
 
 // *will be triggered when continent button is pressed
 
-// let charLabels = [];
-// let charData = [];
-
 function arrangeContinentCovidStat(idx) {
   let charLabels = [];
   let charData = [];
@@ -183,32 +176,39 @@ function arrangeContinentCovidStat(idx) {
         }
       }
     }
-    // myChart.update();
-    console.log(continentArr);
-    console.log(fullCompare);
-    console.log(charLabels);
-    console.log(charData);
-    updateChart(charLabels, charData);
+
+    updateChart(myChart, charLabels, charData);
   }, 500);
+}
+function clearChart() {
+  const charByClass = document.querySelector(".chartjs-hidden-iframe");
+  if (charByClass) {
+    charByClass.remove();
+  }
+}
+
+function updateChart(myChart, label, data) {
+  myChart.data.labels = label;
+  myChart.data.datasets[0].data = data;
+  myChart.update();
 }
 
 // ---------------------chart--------
-function updateChart(label, data) {
-  const myChart = new Chart(ctx, {
-    type: "bar",
-    data: {
-      labels: label,
-      datasets: [
-        {
-          label: "# of dead people!!",
-          data: data,
-          backgroundColor: "rgba(255, 99, 132, 0.2)",
 
-          borderColor: "rgba(255, 99, 132, 1)",
+const myChart = new Chart(ctx, {
+  type: "bar",
+  data: {
+    labels: [],
+    datasets: [
+      {
+        label: "# of dead people!!",
+        data: [],
+        backgroundColor: "rgba(255, 99, 132, 0.2)",
 
-          borderWidth: 1,
-        },
-      ],
-    },
-  });
-}
+        borderColor: "rgba(255, 99, 132, 1)",
+
+        borderWidth: 1,
+      },
+    ],
+  },
+});

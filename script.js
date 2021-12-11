@@ -134,29 +134,27 @@ function makeSelectBtns(country, select) {
 
 function addSelectEvent(name) {
   const selectedSelect = document.querySelector(`.${name.id}Select`);
-  // console.log(name);
 
   selectedSelect.addEventListener("change", (event) => {
     removeSpecific();
     const optionName = event.target.value;
     const optionCc = event.target.options[event.target.selectedIndex].id;
-    // console.log(optionName);
-    // console.log(optionCc);
+
     covidArr.forEach((el) => {
-      // console.log(el.code);
       if (el.code === optionCc) {
         myChart.clear();
-        const canvas = document.querySelector("canvas");
-        const canvasParent = document.querySelector("canvas").parentNode;
+        const specificBtns = document.querySelector(".specific-stats");
+        const Parent = document.querySelector(".specific-stats").parentNode;
         const specificDiv = document.createElement("div");
         specificDiv.classList.add("specificCountryStats");
         specificDiv.innerHTML = optionName;
-        canvasParent.insertBefore(specificDiv, canvas);
+        Parent.insertBefore(specificDiv, specificBtns);
         displayCountryInfo(optionCc, specificDiv);
       }
     });
   });
 }
+
 //* populate the specific country div with the right info about said country
 function displayCountryInfo(optionCc, specificDiv) {
   console.log(specificDiv);
@@ -165,11 +163,12 @@ function displayCountryInfo(optionCc, specificDiv) {
       console.log(typeof el);
       Object.entries(el).forEach(([key, value]) => {
         console.log(key, value);
-
-        const newItem = document.createElement("div");
-        newItem.innerText = key;
-        newItem.classList.add("single-stat");
-        specificDiv.appendChild(newItem);
+        if (key !== "code") {
+          const newItem = document.createElement("div");
+          newItem.innerText = ` ${key} : ${value}`;
+          newItem.classList.add("single-stat");
+          specificDiv.appendChild(newItem);
+        }
       });
     }
   });
@@ -189,7 +188,7 @@ async function addAndCompare(data) {
       critical: e.latest_data.critical,
       recovered: e.latest_data.recovered,
       [`new dead`]: e.today.deaths,
-      newCases: e.today.confirmed,
+      [`new cases`]: e.today.confirmed,
     };
     covidArr.push(newObj);
   });

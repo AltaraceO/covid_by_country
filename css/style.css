@@ -1,3 +1,7 @@
+body {
+  max-width: 1000px;
+}
+
 .main {
   display: flex;
   max-width: 100px;
@@ -5,6 +9,7 @@
   align-items: flex-start;
   justify-content: space-around;
   gap: 30px;
+  /* position: relative; */
 }
 
 .main-container {
@@ -53,12 +58,18 @@ select {
   gap: 10px;
 }
 
-.SpecificCountryStats {
-  width: 600px;
-  height: 100%;
+.specificCountryStats {
+  display: flex;
+  margin: 30px;
+  max-height: 60vh;
+  width: 80vw;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  /* position: absolute; */
 }
 .single-stat {
-  height: 150px;
-  width: 150px;
+  padding: 10px;
   border: green 1px solid;
 }

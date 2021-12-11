@@ -39,7 +39,19 @@ function makeButtons(name, idx) {
     clickContinentBtn(`${btn.innerText}`);
     arrangeContinentCovidStat(idx);
     statSpecificBtn(idx);
+    removeSpecific();
   });
+}
+
+function removeSpecific() {
+  const specificDiv = document.querySelector(".specificCountryStats");
+  console.log(specificDiv);
+  if (typeof specificDiv !== "undefined" && specificDiv !== null) {
+    console.log("here", specificDiv);
+    specificDiv.parentNode.removeChild(specificDiv);
+  } else {
+    console.log("not here", specificDiv);
+  }
 }
 
 async function getCountryData(name) {
@@ -122,12 +134,25 @@ function makeSelectBtns(country, select) {
 
 function addSelectEvent(name) {
   const selectedSelect = document.querySelector(`.${name.id}Select`);
+  console.log(name);
 
   selectedSelect.addEventListener("change", (event) => {
     const optionName = event.target.value;
     const optionCc = event.target.options[event.target.selectedIndex].id;
     console.log(optionName);
     console.log(optionCc);
+    covidArr.forEach((el) => {
+      // console.log(el.code);
+      if (el.code === optionCc) {
+        myChart.clear();
+        const canvas = document.querySelector("canvas");
+        const canvasParent = document.querySelector("canvas").parentNode;
+        const specificDiv = document.createElement("div");
+        specificDiv.classList.add("specificCountryStats");
+        specificDiv.innerHTML = "text for tests";
+        canvasParent.insertBefore(specificDiv, canvas);
+      }
+    });
   });
 }
 
@@ -171,26 +196,26 @@ function arrangeContinentCovidStat(idx, stat = [`total dead`]) {
     for (let i = 0; i < contCompare.length; i++) {
       for (let j = 0; j < fullCompare.length; j++) {
         if (contCompare[i].country_code === fullCompare[j].code) {
-          // console.log(contCompare[i].name, fullCompare[j].deadNew);
           charLabels.push(contCompare[i].name);
           charData.push(fullCompare[j][stat]);
         }
       }
     }
 
-    updateChart(myChart, charLabels, charData);
+    updateChart(myChart, charLabels, charData, stat);
   }, 500);
 }
 
-function updateChart(myChart, label, data) {
+function updateChart(myChart, label, data, stat) {
   myChart.data.labels = label;
   myChart.data.datasets[0].data = data;
+  myChart.data.datasets[0].label = stat;
   myChart.update();
 }
 
 function statSpecificBtn(idx) {
   const statsContainer = document.querySelector(".specific-stats");
-  console.log(covidArr[0]);
+
   if (statsContainer.innerHTML === "") {
     Object.keys(covidArr[0]).forEach(function (key) {
       if (key !== "code") {
@@ -199,11 +224,7 @@ function statSpecificBtn(idx) {
         statBtns.innerText = `${key}`;
         statsContainer.appendChild(statBtns);
         statBtns.addEventListener("click", () => {
-          // continentNames();
-          // clickContinentBtn(`${btn.innerText}`);
           arrangeContinentCovidStat(idx, key);
-          // statSpecificBtn();
-          console.log(typeof key);
         });
       }
     });
@@ -218,7 +239,7 @@ const myChart = new Chart(ctx, {
     labels: [],
     datasets: [
       {
-        label: "# of dead people!!",
+        label: "",
         data: [],
         backgroundColor: "rgba(255, 99, 132, 0.2)",
 

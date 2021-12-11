@@ -14,7 +14,7 @@ let continentArr = [
 
 const covidArr = [];
 
-const names = ["asia", "africa", "europe", "americas", "oceania"];
+const names = ["Asia", "Africa", "Europe", "Americas", "Oceania"];
 
 async function continentNames() {
   mainSec.innerHTML = "";
@@ -56,6 +56,7 @@ function removeSpecific() {
 
 async function getCountryData(name) {
   const response = await axios.get(`${proxi}${countryInfo}${name}`);
+  // console.log(response.data);
   return response.data;
 }
 
@@ -101,6 +102,7 @@ function makeDropdown(name) {
   const select = document.createElement("select");
   select.classList.add(`${name}Select`);
   btnDiv.appendChild(select);
+  // console.log(btnDiv);
 
   populateOption(name);
 }
@@ -112,7 +114,7 @@ function populateOption(name) {
 
   continentArr.forEach((e) => {
     const nameArr = e.continent.name.toLocaleLowerCase();
-    if (nameArr === name) {
+    if (nameArr === name.toLowerCase()) {
       const countries = e.continent.countries;
       countries.forEach((country) => {
         makeSelectBtns(country, contSelect);
@@ -157,12 +159,9 @@ function addSelectEvent(name) {
 
 //* populate the specific country div with the right info about said country
 function displayCountryInfo(optionCc, specificDiv) {
-  console.log(specificDiv);
   covidArr.forEach((el) => {
     if (el.code === optionCc) {
-      console.log(typeof el);
       Object.entries(el).forEach(([key, value]) => {
-        console.log(key, value);
         if (key !== "code") {
           const newItem = document.createElement("div");
           newItem.innerText = ` ${key} : ${value}`;
@@ -231,21 +230,20 @@ function updateChart(myChart, label, data, stat) {
 
 function statSpecificBtn(idx) {
   const statsContainer = document.querySelector(".specific-stats");
+  statsContainer.innerHTML = "";
 
-  if (statsContainer.innerHTML === "") {
-    Object.keys(covidArr[0]).forEach(function (key) {
-      if (key !== "code") {
-        const statBtns = document.createElement("div");
-        statBtns.classList.add("continentBtn");
-        statBtns.innerText = `${key}`;
-        statsContainer.appendChild(statBtns);
-        statBtns.addEventListener("click", () => {
-          removeSpecific();
-          arrangeContinentCovidStat(idx, key);
-        });
-      }
-    });
-  }
+  Object.keys(covidArr[0]).forEach(function (key) {
+    if (key !== "code") {
+      const statBtns = document.createElement("div");
+      statBtns.classList.add("continentBtn");
+      statBtns.innerText = `${key}`;
+      statsContainer.appendChild(statBtns);
+      statBtns.addEventListener("click", (e) => {
+        removeSpecific();
+        arrangeContinentCovidStat(idx, key);
+      });
+    }
+  });
 }
 
 // ---------------------chart--------

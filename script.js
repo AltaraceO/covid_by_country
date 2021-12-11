@@ -45,12 +45,12 @@ function makeButtons(name, idx) {
 
 function removeSpecific() {
   const specificDiv = document.querySelector(".specificCountryStats");
-  console.log(specificDiv);
+  // console.log(specificDiv);
   if (typeof specificDiv !== "undefined" && specificDiv !== null) {
-    console.log("here", specificDiv);
+    // console.log("here", specificDiv);
     specificDiv.parentNode.removeChild(specificDiv);
   } else {
-    console.log("not here", specificDiv);
+    // console.log("not here", specificDiv);
   }
 }
 
@@ -134,13 +134,14 @@ function makeSelectBtns(country, select) {
 
 function addSelectEvent(name) {
   const selectedSelect = document.querySelector(`.${name.id}Select`);
-  console.log(name);
+  // console.log(name);
 
   selectedSelect.addEventListener("change", (event) => {
+    removeSpecific();
     const optionName = event.target.value;
     const optionCc = event.target.options[event.target.selectedIndex].id;
-    console.log(optionName);
-    console.log(optionCc);
+    // console.log(optionName);
+    // console.log(optionCc);
     covidArr.forEach((el) => {
       // console.log(el.code);
       if (el.code === optionCc) {
@@ -149,14 +150,30 @@ function addSelectEvent(name) {
         const canvasParent = document.querySelector("canvas").parentNode;
         const specificDiv = document.createElement("div");
         specificDiv.classList.add("specificCountryStats");
-        specificDiv.innerHTML = "text for tests";
+        specificDiv.innerHTML = optionName;
         canvasParent.insertBefore(specificDiv, canvas);
+        displayCountryInfo(optionCc, specificDiv);
       }
     });
   });
 }
+//* populate the specific country div with the right info about said country
+function displayCountryInfo(optionCc, specificDiv) {
+  console.log(specificDiv);
+  covidArr.forEach((el) => {
+    if (el.code === optionCc) {
+      console.log(typeof el);
+      Object.entries(el).forEach(([key, value]) => {
+        console.log(key, value);
 
-function displayCountryInfo(optionName) {}
+        const newItem = document.createElement("div");
+        newItem.innerText = key;
+        newItem.classList.add("single-stat");
+        specificDiv.appendChild(newItem);
+      });
+    }
+  });
+}
 
 async function getCovidInfo() {
   const response = await axios.get(`${proxi}${covidInfo}`);
@@ -224,6 +241,7 @@ function statSpecificBtn(idx) {
         statBtns.innerText = `${key}`;
         statsContainer.appendChild(statBtns);
         statBtns.addEventListener("click", () => {
+          removeSpecific();
           arrangeContinentCovidStat(idx, key);
         });
       }

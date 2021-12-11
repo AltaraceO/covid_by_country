@@ -10,7 +10,7 @@
 .main-container {
   /* max-width: 100px; */
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: flex-start;
   gap: 1rem;
 }

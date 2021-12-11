@@ -1,4 +1,5 @@
 const mainSec = document.querySelector(".main");
+const ctx = document.getElementById("myChart").getContext("2d");
 const proxi = "https://intense-mesa-62220.herokuapp.com/";
 const countryInfo = "https://restcountries.herokuapp.com/api/v1/region/";
 const covidInfo = "https://corona-api.com/countries";
@@ -76,7 +77,11 @@ async function getCountNameNRegion(data) {
 async function pushCountries(obj) {
   for (let el of continentArr) {
     if (obj.region === el.continent.name) {
-      el.continent.countries.push(obj);
+      if (el.continent.countries.some((count) => count.name === obj.name)) {
+        console.log("already");
+      } else {
+        el.continent.countries.push(obj);
+      }
     }
   }
 }
@@ -156,68 +161,54 @@ getCovidInfo().then((data) => {
 });
 
 // *will be triggered when continent button is pressed
-// setTimeout(() => {
-let charLabels = [];
-let charData = [];
-// }, 3000);
+
+// let charLabels = [];
+// let charData = [];
 
 function arrangeContinentCovidStat(idx) {
-  charLabels = [];
-  charData = [];
+  let charLabels = [];
+  let charData = [];
   setTimeout(() => {
     const contCompare = continentArr[idx].continent.countries;
     const fullCompare = covidArr;
+    charLabels = [];
+    charData = [];
 
     for (let i = 0; i < contCompare.length; i++) {
       for (let j = 0; j < fullCompare.length; j++) {
         if (contCompare[i].country_code === fullCompare[j].code) {
-          console.log(contCompare[i].name, fullCompare[j].recovered);
+          // console.log(contCompare[i].name, fullCompare[j].recovered);
           charLabels.push(contCompare[i].name);
           charData.push(fullCompare[j].recovered);
         }
       }
     }
+    // myChart.update();
+    console.log(continentArr);
+    console.log(fullCompare);
+    console.log(charLabels);
+    console.log(charData);
+    updateChart(charLabels, charData);
   }, 500);
 }
 
 // ---------------------chart--------
-setTimeout(() => {
-  const ctx = document.getElementById("myChart").getContext("2d");
-
+function updateChart(label, data) {
   const myChart = new Chart(ctx, {
     type: "bar",
     data: {
-      labels: charLabels,
+      labels: label,
       datasets: [
         {
           label: "# of dead people!!",
-          data: charData,
-          backgroundColor: [
-            "rgba(255, 99, 132, 0.2)",
-            "rgba(54, 162, 235, 0.2)",
-            "rgba(255, 206, 86, 0.2)",
-            "rgba(75, 192, 192, 0.2)",
-            "rgba(153, 102, 255, 0.2)",
-            "rgba(255, 159, 64, 0.2)",
-          ],
-          borderColor: [
-            "rgba(255, 99, 132, 1)",
-            "rgba(54, 162, 235, 1)",
-            "rgba(255, 206, 86, 1)",
-            "rgba(75, 192, 192, 1)",
-            "rgba(153, 102, 255, 1)",
-            "rgba(255, 159, 64, 1)",
-          ],
+          data: data,
+          backgroundColor: "rgba(255, 99, 132, 0.2)",
+
+          borderColor: "rgba(255, 99, 132, 1)",
+
           borderWidth: 1,
         },
       ],
     },
-    options: {
-      scales: {
-        y: {
-          beginAtZero: true,
-        },
-      },
-    },
   });
-}, 15000);
+}
